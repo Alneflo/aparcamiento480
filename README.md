@@ -12,4 +12,4 @@
 
 ## Ejecución
 
-Para ejecutar la aplicación se puede ejecutar el archivo compilado que puedes encontrar [aquí](https://github.com/Alneflo/aparcamiento480/releases) o tambien puedes ejecutarlo a mano con la terminal en la carpeta donde está el archivo .jar usando el comando `java -jar ./Practica1Java`
+Para ejecutar la aplicación se puede ejecutar el archivo compilado que puedes encontrar [aquí](https://github.com/Alneflo/aparcamiento480/releases) o tambien puedes ejecutarlo a mano con la terminal en la carpeta donde está el archivo .jar usando el comando `java -jar ./Aparcamiento480v1.0.jar`

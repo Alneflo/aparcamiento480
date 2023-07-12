@@ -1,4 +1,4 @@
-# aparcamiento480
+# Aparcamiento480
 Ésta es una aplicación para gestionar la entrada y salida de un aparcamiento, es un ejercicio de práctica de Java proporcionado por 480.
 
 ## Usos

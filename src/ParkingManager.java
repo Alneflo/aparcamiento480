@@ -35,29 +35,33 @@ public class ParkingManager {
 		Record r = null;
 		int licenseBelonging;
 		
-		if(!hasEntered(licensePlate)) {
-			licenseBelonging = residentOrNonOrOfficial(licensePlate);
-			switch(licenseBelonging) {
-				case 1:
-					r = new Record(residentVList.getVehicleByPlate(licensePlate));
-					setEnterRecord(r);
-				break;
-				case 0:
-					r = new Record(officialVList.getVehicleByPlate(licensePlate));
-					setEnterRecord(r);
-				break;
-				case -1:
-					if(!Utilities.isNotResident(nonResidentVList, licensePlate)) {
-						nonResidentVList.addVehicle(new NonResidentVehicle(licensePlate));
-					}
-					r = new Record(nonResidentVList.getVehicleByPlate(licensePlate));
-					setEnterRecord(r);
-				break;
+		if(Utilities.validLicensePlate(licensePlate)) {
+			if(!hasEntered(licensePlate)) {
+				licenseBelonging = residentOrNonOrOfficial(licensePlate);
+				switch(licenseBelonging) {
+					case 1:
+						r = new Record(residentVList.getVehicleByPlate(licensePlate));
+						setEnterRecord(r);
+					break;
+					case 0:
+						r = new Record(officialVList.getVehicleByPlate(licensePlate));
+						setEnterRecord(r);
+					break;
+					case -1:
+						if(!Utilities.isNotResident(nonResidentVList, licensePlate)) {
+							nonResidentVList.addVehicle(new NonResidentVehicle(licensePlate));
+						}
+						r = new Record(nonResidentVList.getVehicleByPlate(licensePlate));
+						setEnterRecord(r);
+					break;
+				}
+				return licenseBelonging;
+				
+			}else {
+				return 41; //Already entered Error
 			}
-			return licenseBelonging;
-			
 		}else {
-			return 41; //Already entered Error
+			return 40; //Invalid license plate Error
 		}
 		
 		
@@ -80,46 +84,53 @@ public class ParkingManager {
 		Report rP;
 		int licenseBelonging;
 		
-		if(hasEntered(licensePlate)) {
-			r = getLastRecordByPlate(licensePlate);
-			if(r!=null) {
-				r.setExitTime();
+		if(Utilities.validLicensePlate(licensePlate)) {
+			if(hasEntered(licensePlate)) {
+				r = getLastRecordByPlate(licensePlate);
+				if(r!=null) {
+					r.setExitTime();
+				}
+				licenseBelonging = residentOrNonOrOfficial(licensePlate);
+				switch(licenseBelonging) {
+					case 1:
+						do {
+							rP = getReportByRecord(r);
+							if(rP!=null) {
+								rP.addTime(r);
+								repeat = false;
+							}else {
+								newReport(r);
+							}
+						}while(repeat);
+						setExitRecord(r);
+					break;
+					case 0:
+						setExitRecord(r);
+					break;
+					case -1:
+						rP = new Report(r.getVehicle());
+						setExitRecord(r);
+						rP.addTime(r);
+						price = rP.getAmount();
+					break;
+				}
+				return licenseBelonging;
+			}else {
+				return 42;
 			}
-			licenseBelonging = residentOrNonOrOfficial(licensePlate);
-			switch(licenseBelonging) {
-				case 1:
-					do {
-						rP = getReportByRecord(r);
-						if(rP!=null) {
-							rP.addTime(r);
-							repeat = false;
-						}else {
-							newReport(r);
-						}
-					}while(repeat);
-					setExitRecord(r);
-				break;
-				case 0:
-					setExitRecord(r);
-				break;
-				case -1:
-					rP = new Report(r.getVehicle());
-					setExitRecord(r);
-					rP.addTime(r);
-					price = rP.getAmount();
-					recordList.remove(r);
-					nonResidentVList.removeVehicle(nonResidentVList.getVehicleByPlate(r.getVehicle().getLicensePlate()));
-				break;
-			}
-			return licenseBelonging;
 		}else {
-			return 42;
+			return 40;
 		}
 		
 	}
 	
 	public double getPrice() {
 		return price;
+	}
+	
+	public void removeNonResident(String licensePlate) {
+		nonResidentVList.removeVehicle((NonResidentVehicle)getLastRecordByPlate(licensePlate).getVehicle());
+		recordList.remove(getLastRecordByPlate(licensePlate));
 	}
 	
 	//Register a single vehicle
@@ -241,6 +252,8 @@ public class ParkingManager {
 	
 	public String getError(int code) {
 		switch(code) {
+		case 40:
+		return ErrorStrings.error40();
 		case 41:
 		return ErrorStrings.error41();
 		case 42:

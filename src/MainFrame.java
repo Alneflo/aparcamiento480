@@ -2,16 +2,18 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import java.awt.GridLayout;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.SwingConstants;
 import java.awt.SystemColor;
+
 import javax.swing.ImageIcon;
 
 public class MainFrame extends JFrame {
@@ -66,9 +68,9 @@ public class MainFrame extends JFrame {
 		JButton recordEntryButton = new JButton("REGISTRAR ENTRADA");
 		recordEntryButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				boolean entry = true;
-				int vehicle = -1;
-				platePopUp(entry, vehicle);
+				licensePlate = JOptionPane.showInputDialog("Matrícula: ");
+				result = pK.recordEntry(licensePlate);
+				messagePop(false, true, false);
 			}
 		});
 		recordEntryButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\git\\Practica1\\PracticaJava1Swing\\imgs\\EntryIcon.png"));
@@ -79,9 +81,21 @@ public class MainFrame extends JFrame {
 		JButton recordExitButton = new JButton("REGISTRAR SALIDA");
 		recordExitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				boolean entry = false;
-				int vehicle = -1;
-				platePopUp(entry, vehicle);
+				String message;
+				licensePlate = JOptionPane.showInputDialog("Matrícula: ");
+				result = pK.recordExit(licensePlate);
+				messagePop(true,false, false);
+				if(result == -1) {
+					if(price == 0) {
+						message = "No ha acumulado suficiente tiempo estacionado, asi que no se le cobrará";
+					}else {
+						message = "Debe pagar " + price + "€";
+					}
+					JOptionPane.showMessageDialog(null, message, "Registrado", JOptionPane.INFORMATION_MESSAGE);
+					pK.removeNonResident(licensePlate);
+				}
+				
+				JOptionPane.showOptionDialog(recordExitButton, "A", "B", ALLBITS, ABORT, null, getComponentListeners(), e);
 			}
 		});
 		recordExitButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\git\\Practica1\\PracticaJava1Swing\\imgs\\ExitIcon.png"));
@@ -92,9 +106,10 @@ public class MainFrame extends JFrame {
 		JButton registerOfficialButton = new JButton("REGISTRAR VEHÍCULO OFICIAL");
 		registerOfficialButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				boolean entry = false;
-				int vehicle = 0;
-				platePopUp(entry, vehicle);
+				boolean official = true;
+				licensePlate = JOptionPane.showInputDialog("Matrícula: ");
+				result = pK.registerVehicle(licensePlate, official);
+				messagePop(false, false, true);
 			}
 		});
 		registerOfficialButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\git\\Practica1\\PracticaJava1Swing\\imgs\\OfficialVehicleIcon.png"));
@@ -105,9 +120,10 @@ public class MainFrame extends JFrame {
 		JButton registerResidentialButton = new JButton("REGISTRAR VEHÍCULO DE RESIDENTE");
 		registerResidentialButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				boolean entry = false;
-				int vehicle = 1;
-				platePopUp(entry, vehicle);
+				boolean official = false;
+				licensePlate = JOptionPane.showInputDialog("Matrícula: ");
+				result = pK.registerVehicle(licensePlate, official);
+				messagePop(false, false, true);
 			}
 		});
 		registerResidentialButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\git\\Practica1\\PracticaJava1Swing\\imgs\\ResidentVehicleIcon.png"));
@@ -130,9 +146,16 @@ public class MainFrame extends JFrame {
 		createReportButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(!pK.getReportList().isEmpty()) {
-					reportPopUp();
+					do {
+						fileName = JOptionPane.showInputDialog("Nombre del archivo: ");
+						if(fileName.replaceAll(" ", "").isEmpty()) {
+							JOptionPane.showMessageDialog(null, "Introduzca un nombre con al menos un carácter", "Error", ERROR);
+						}
+					} while (fileName.isEmpty());
+					pK.createReport(fileName);
 				}else {
-					messagePopUp(pK.getError(44), true);
+					result = 44;
+					messagePop(false, false, false);
 				}
 			}
 		});
@@ -158,228 +181,51 @@ public class MainFrame extends JFrame {
 		pK = new ParkingManager();
 	}
 	
-	public void showMessage() {
-		switch(result) {
+	public String setMessage(boolean exit, boolean entry, boolean register) {
+		String text;
+		
+		switch(pK.residentOrNonOrOfficial(licensePlate)){
 		case 1:
-			messagePopUp("Vehículo de residente registrado correctamente", false);
+			if(exit) {
+				text = "Salida de vehiculo de residente registrada";
+			}else if(entry){
+				text = "Entrada de vehiculo de residente registrada";
+			}else {
+				text = "Vehiculo de residente registrado";
+			}
 			break;
 		case 0:
-			messagePopUp("Vehículo oficial registrado correctamente", false);
-			break;
-		case -1:
-			messagePopUp("Vehículo registrado correctamente", false);
+			if(exit) {
+				text = "Salida de vehiculo oficial registrada";
+			}else if(entry){
+				text = "Entrada de vehiculo oficial registrada";
+			}else {
+				text = "Vehiculo oficial registrado";
+			}
 			break;
 		default:
-			if(!pK.getError(result).isEmpty()) {
-				messagePopUp(pK.getError(result), true);
+			if(exit) {
+				price = pK.getPrice();
+				text = "Salida de vehiculo no residente registrado";
+			}else {
+				text = "Entrada de vehiculo no residente registrada";
 			}
 		}
+		return text;
 	}
 	
-	public void platePopUp(boolean entry, int vehicle) {
-		JFrame popUpWindow;
-		JPanel panelContent, panel;
-		
-		popUpWindow = new JFrame();
-		popUpWindow.setType(Type.POPUP);
-		popUpWindow.setVisible(true);
-		popUpWindow.setBackground(SystemColor.activeCaption);
-		
-		popUpWindow.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		popUpWindow.setBounds(100, 100, 600, 250);
-		popUpWindow.setResizable(false);
-		panelContent = new JPanel();
-		
-		popUpWindow.setContentPane(panelContent);
-		panelContent.setLayout(new GridLayout(1, 0, 0, 0));
-		
-		panel = new JPanel();
-		panelContent.add(panel);
-		panel.setLayout(null);
-		panel.setBackground(SystemColor.activeCaption);
-		
-		JLabel plateTitle = new JLabel("INTRODUCE LA MATRÍCULA");
-		plateTitle.setHorizontalAlignment(SwingConstants.CENTER);
-		plateTitle.setFont(new Font("Century Gothic", Font.PLAIN, 30));
-		plateTitle.setForeground(new Color(0, 0, 0));
-		plateTitle.setBounds(10, 5, 600, 80);
-		panel.add(plateTitle);
-		
-		JTextField licenseInput = new JTextField();
-		licenseInput.setBounds(150, 100, 400, 20);
-		licenseInput.setColumns(7);
-		panel.add(licenseInput);
-		
-		JLabel licenseLabel = new JLabel("MATRÍCULA: ");
-		licenseLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		licenseLabel.setFont(new Font("Century Gothic", Font.PLAIN, 14));
-		licenseLabel.setForeground(new Color(0, 0, 0));
-		licenseLabel.setBounds(50, 100, 100, 20);
-		panel.add(licenseLabel);
-		
-		JLabel errorLabel = new JLabel("La matrícula no es válida (0000AAA)");
-		errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		errorLabel.setFont(new Font("Century Gothic", Font.PLAIN, 14));
-		errorLabel.setForeground(new Color(255, 0, 0));
-		errorLabel.setBounds(150, 130, 300, 20);
-		panel.add(errorLabel);
-		errorLabel.setVisible(false);
-		
-		JButton acceptButton = new JButton("ACEPTAR");
-		acceptButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				errorLabel.setVisible(false);
-				licensePlate = licenseInput.getText();
-				if(Utilities.validLicensePlate(licensePlate)) {
-					popUpWindow.dispose();
-					if(entry) {
-						result = pK.recordEntry(licensePlate);
-					}else if(vehicle == -1){
-						result = pK.recordExit(licensePlate);
-						price = pK.getPrice();
-					}else {
-						boolean official;
-						switch(vehicle) {
-						case 0:
-							official = true;
-							result = pK.registerVehicle(licensePlate, official);
-							break;
-						case 1:
-							official = false;
-							result = pK.registerVehicle(licensePlate, official);
-							break;
-						}
-					}
-					showMessage();
-				}else {
-					errorLabel.setVisible(true);
-				}
-			}
-		});
-		
-		acceptButton.setFont(new Font("Century Gothic", Font.PLAIN, 12));
-		acceptButton.setBounds(250, 150, 120, 30);
-		panel.add(acceptButton);
-	}
-	
-	public void messagePopUp(String message, boolean error) {
-		JFrame popUpWindow;
-		JPanel panelContent, panel;
-		int red = 0;
-		
-		popUpWindow = new JFrame();
-		popUpWindow.setType(Type.POPUP);
-		popUpWindow.setVisible(true);
-		popUpWindow.setBackground(SystemColor.activeCaption);
-		
-		popUpWindow.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		popUpWindow.setBounds(100, 100, 700, 180);
-		popUpWindow.setResizable(false);
-		panelContent = new JPanel();
-		
-		popUpWindow.setContentPane(panelContent);
-		panelContent.setLayout(new GridLayout(1, 0, 0, 0));
-		
-		panel = new JPanel();
-		panelContent.add(panel);
-		panel.setLayout(null);
-		panel.setBackground(SystemColor.activeCaption);
-		
-		if(error) {
-			red = 255;
+	public void messagePop(boolean exit, boolean entry, boolean register) {
+		String message, title;
+		int imgOb;
+		if(result<2) {
+			message = setMessage(exit, entry, register);
+			imgOb = JOptionPane.INFORMATION_MESSAGE;
+			title = "Registrado";
+		}else {
+			message = pK.getError(result);
+			imgOb = JOptionPane.ERROR_MESSAGE;
+			title = "Error";
 		}
-		
-		JLabel messageTitle = new JLabel(message.toUpperCase());
-		messageTitle.setHorizontalAlignment(SwingConstants.CENTER);
-		messageTitle.setFont(new Font("Century Gothic", Font.PLAIN, 20));
-		messageTitle.setForeground(new Color(red, 0, 0));
-		messageTitle.setBounds(0, 0, 700, 80);
-		panel.add(messageTitle);
-		
-		JButton acceptButton = new JButton("ACEPTAR");
-		acceptButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				popUpWindow.dispose();
-				if(price > 0) {
-					messagePopUp("Debe pagar " + price + "€", false);
-					price = 0;
-				}
-			}
-		});
-		
-		acceptButton.setFont(new Font("Century Gothic", Font.PLAIN, 12));
-		acceptButton.setBounds(300, 80, 120, 30);
-		panel.add(acceptButton);
-	}
-	
-	public void reportPopUp() {
-		JFrame popUpWindow;
-		JPanel panelContent, panel;
-		
-		popUpWindow = new JFrame();
-		popUpWindow.setType(Type.POPUP);
-		popUpWindow.setVisible(true);
-		popUpWindow.setBackground(SystemColor.activeCaption);
-		
-		popUpWindow.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		popUpWindow.setBounds(100, 100, 600, 250);
-		popUpWindow.setResizable(false);
-		panelContent = new JPanel();
-		
-		popUpWindow.setContentPane(panelContent);
-		panelContent.setLayout(new GridLayout(1, 0, 0, 0));
-		
-		panel = new JPanel();
-		panelContent.add(panel);
-		panel.setLayout(null);
-		panel.setBackground(SystemColor.activeCaption);
-		
-		JLabel nameTitle = new JLabel("INTRODUCE EL NOMBRE DEL ARCHIVO");
-		nameTitle.setHorizontalAlignment(SwingConstants.CENTER);
-		nameTitle.setFont(new Font("Century Gothic", Font.PLAIN, 20));
-		nameTitle.setForeground(new Color(0, 0, 0));
-		nameTitle.setBounds(0, 0, 600, 80);
-		panel.add(nameTitle);
-		
-		JTextField nameInput = new JTextField();
-		nameInput.setBounds(150, 100, 400, 20);
-		nameInput.setColumns(7);
-		panel.add(nameInput);
-		
-		JLabel nameLabel = new JLabel("NOMBRE: ");
-		nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		nameLabel.setFont(new Font("Century Gothic", Font.PLAIN, 14));
-		nameLabel.setForeground(new Color(0, 0, 0));
-		nameLabel.setBounds(50, 100, 100, 20);
-		panel.add(nameLabel);
-		
-		JLabel errorLabel = new JLabel("El nombre debe tener al menos un carácter");
-		errorLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		errorLabel.setFont(new Font("Century Gothic", Font.PLAIN, 14));
-		errorLabel.setForeground(new Color(255, 0, 0));
-		errorLabel.setBounds(150, 130, 300, 20);
-		panel.add(errorLabel);
-		errorLabel.setVisible(false);
-		
-		JButton acceptButton = new JButton("ACEPTAR");
-		acceptButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				errorLabel.setVisible(false);
-				if(!nameInput.getText().isEmpty()) {
-					fileName = nameInput.getText();
-					result = pK.createReport(fileName);
-					if(result == 1) {
-						messagePopUp("Informe creado correctamente", false);
-					}
-					popUpWindow.dispose();
-				}else {
-					errorLabel.setVisible(true);
-				}
-			}
-		});
-		
-		acceptButton.setFont(new Font("Century Gothic", Font.PLAIN, 12));
-		acceptButton.setBounds(250, 150, 120, 30);
-		panel.add(acceptButton);
+		JOptionPane.showMessageDialog(null, message, title, imgOb);
 	}
 }

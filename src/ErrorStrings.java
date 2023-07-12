@@ -5,6 +5,10 @@ public class ErrorStrings {
 		
 	}
 	
+	public static String error40() {
+		return "Error, formato de matrícula erróneo (0000AAA)";
+	}
+	
 	public static String error41() {
 		return "Error, el vehículo ya ha sido registrado en entrada";
 	}

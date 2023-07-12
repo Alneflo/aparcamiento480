@@ -16,6 +16,10 @@ import javax.swing.ImageIcon;
 
 public class MainFrame extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private String licensePlate;
 	private ParkingManager pK;
@@ -67,7 +71,7 @@ public class MainFrame extends JFrame {
 				platePopUp(entry, vehicle);
 			}
 		});
-		recordEntryButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\eclipse-workspace\\PracticaJava1Swing\\imgs\\EntryIcon.png"));
+		recordEntryButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\git\\Practica1\\PracticaJava1Swing\\imgs\\EntryIcon.png"));
 		recordEntryButton.setFont(new Font("Century Gothic", Font.PLAIN, 12));
 		recordEntryButton.setBounds(10, 81, 312, 63);
 		panel.add(recordEntryButton);
@@ -80,7 +84,7 @@ public class MainFrame extends JFrame {
 				platePopUp(entry, vehicle);
 			}
 		});
-		recordExitButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\eclipse-workspace\\PracticaJava1Swing\\imgs\\ExitIcon.png"));
+		recordExitButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\git\\Practica1\\PracticaJava1Swing\\imgs\\ExitIcon.png"));
 		recordExitButton.setFont(new Font("Century Gothic", Font.PLAIN, 12));
 		recordExitButton.setBounds(415, 81, 312, 63);
 		panel.add(recordExitButton);
@@ -93,7 +97,7 @@ public class MainFrame extends JFrame {
 				platePopUp(entry, vehicle);
 			}
 		});
-		registerOfficialButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\eclipse-workspace\\PracticaJava1Swing\\imgs\\OfficialVehicleIcon.png"));
+		registerOfficialButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\git\\Practica1\\PracticaJava1Swing\\imgs\\OfficialVehicleIcon.png"));
 		registerOfficialButton.setFont(new Font("Century Gothic", Font.PLAIN, 12));
 		registerOfficialButton.setBounds(10, 190, 312, 63);
 		panel.add(registerOfficialButton);
@@ -106,7 +110,7 @@ public class MainFrame extends JFrame {
 				platePopUp(entry, vehicle);
 			}
 		});
-		registerResidentialButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\eclipse-workspace\\PracticaJava1Swing\\imgs\\ResidentVehicleIcon.png"));
+		registerResidentialButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\git\\Practica1\\PracticaJava1Swing\\imgs\\ResidentVehicleIcon.png"));
 		registerResidentialButton.setFont(new Font("Century Gothic", Font.PLAIN, 12));
 		registerResidentialButton.setBounds(415, 190, 312, 63);
 		panel.add(registerResidentialButton);
@@ -117,7 +121,7 @@ public class MainFrame extends JFrame {
 				pK.startMonth();
 			}
 		});
-		startMonthButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\eclipse-workspace\\PracticaJava1Swing\\imgs\\MonthIcon.png"));
+		startMonthButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\git\\Practica1\\PracticaJava1Swing\\imgs\\MonthIcon.png"));
 		startMonthButton.setFont(new Font("Century Gothic", Font.PLAIN, 12));
 		startMonthButton.setBounds(10, 292, 312, 63);
 		panel.add(startMonthButton);
@@ -132,7 +136,7 @@ public class MainFrame extends JFrame {
 				}
 			}
 		});
-		createReportButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\eclipse-workspace\\PracticaJava1Swing\\imgs\\DocumentIcon.png"));
+		createReportButton.setIcon(new ImageIcon("C:\\Users\\AlejandroNebotFlores\\git\\Practica1\\PracticaJava1Swing\\imgs\\DocumentIcon.png"));
 		createReportButton.setFont(new Font("Century Gothic", Font.PLAIN, 12));
 		createReportButton.setBounds(415, 292, 312, 63);
 		panel.add(createReportButton);
@@ -304,7 +308,7 @@ public class MainFrame extends JFrame {
 		});
 		
 		acceptButton.setFont(new Font("Century Gothic", Font.PLAIN, 12));
-		acceptButton.setBounds(330, 80, 120, 30);
+		acceptButton.setBounds(300, 80, 120, 30);
 		panel.add(acceptButton);
 	}
 	
@@ -333,7 +337,7 @@ public class MainFrame extends JFrame {
 		JLabel nameTitle = new JLabel("INTRODUCE EL NOMBRE DEL ARCHIVO");
 		nameTitle.setHorizontalAlignment(SwingConstants.CENTER);
 		nameTitle.setFont(new Font("Century Gothic", Font.PLAIN, 20));
-		nameTitle.setForeground(new Color(255, 0, 0));
+		nameTitle.setForeground(new Color(0, 0, 0));
 		nameTitle.setBounds(0, 0, 600, 80);
 		panel.add(nameTitle);
 		
@@ -361,7 +365,7 @@ public class MainFrame extends JFrame {
 		acceptButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				errorLabel.setVisible(false);
-				if(!nameInput.getText().isBlank()) {
+				if(!nameInput.getText().isEmpty()) {
 					fileName = nameInput.getText();
 					result = pK.createReport(fileName);
 					if(result == 1) {

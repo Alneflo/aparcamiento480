@@ -12,47 +12,6 @@ public class Utilities {
 		
 	}
 	
-	//Shows a text menu with 7 options, it will register the input of the user and if it's valid (between 1 and 7) it will return the value
-	
-	public static int menu() {
-		BufferedReader sc = new BufferedReader(new InputStreamReader(System.in));
-		int selection = 0;
-		boolean repeat;
-		
-		do {
-			
-				System.out.println("""
-					
-					----------   MENÚ GESTIÓN APARCAMIENTO   ----------
-					
-						1.- Registrar entrada
-						2.- Registrar salida
-						3.- Dar de alta a un vehículo oficial
-						4.- Dar de alta a un vehículo residente
-						5.- Comienza el mes
-						6.- Pagos residentes
-						7.- Salir
-					
-				""");
-			try {
-				selection = Integer.parseInt(sc.readLine());
-			}catch(Exception e) {
-				System.err.println("Error en el texto de entrada");
-				sc = new BufferedReader(new InputStreamReader(System.in));
-			}
-			
-			if(selection > 7 || selection < 1) {
-				repeat = true;
-				System.err.println("Error, entrada fuera de rango");
-			}else {
-				repeat = false;
-			}
-			
-		}while(repeat);
-		
-		return selection;
-	}
-	
 	//Reads a text entered by the user
 	
 	public static String readInput(String text) {

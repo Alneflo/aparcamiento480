@@ -1,0 +1,2 @@
+Matrícula	Tiempo Estacionado(min)	Cantidad a pagar
+1234ABC		0			0.0

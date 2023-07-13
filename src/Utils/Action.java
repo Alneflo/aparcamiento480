@@ -1,0 +1,9 @@
+package Utils;
+
+public enum Action {
+	ENTRY,
+	EXIT,
+	REGISTER_RESIDENT,
+	REGISTER_OFFICIAL,
+	CREATE_REPORT
+}

@@ -20,6 +20,8 @@ public abstract class Vehicle implements Comparable<Vehicle>{
 	}
 	
 	public abstract double getPriceMinute();
+	
+	public abstract String getName();
 
 	@Override
 	public int compareTo(Vehicle o) {
